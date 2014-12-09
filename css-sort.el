@@ -125,7 +125,7 @@
 (defun css-sort-attribute-index (line)
   (or (css-sort-index
        (css-sort-attribute-from-line line) css-sort-attributes-order)
-      1000))
+      -1))
 
 ; (css-sort-attribute-index "    color: aslfa") => 70
 
@@ -135,18 +135,38 @@
 
 ; (css-attribute-sort-compare "    position: symfo" "   background: qwants") => 't
 
-(defun lines-in-region (start end)
+(defun css-sort-lines-in-region (start end)
   (split-string (buffer-substring start end) "[\n]"))
 
+
+(defun css-sort-beginning-of-attribute-block (start)
+  (goto-char start)
+  (search-backward "{")
+  (forward-line 1)
+  (beginning-of-line)
+  (point))
+
+; { (beginning-of-attribute-block (point)) => 4044 or something
+
+(defun css-sort-end-of-attribute-block (start)
+  (goto-char start)
+  (re-search-forward "[{}]")
+  (forward-line -1)
+  (end-of-line)
+  (point))
+
 ;;;###autoload
-(defun css-sort-attributes-in-region (start end)
+(defun css-sort-attributes (start end)
   (interactive "r")
   (save-excursion
-    (let ((lines
-           (sort (lines-in-region start end) #'css-attribute-sort-compare)))
+    (let* ((current (point))
+           (start (css-sort-beginning-of-attribute-block current))
+           (end (css-sort-end-of-attribute-block current))
+           (lines (css-sort-lines-in-region start end))
+           (sorted-lines (sort lines #'css-attribute-sort-compare)))
       (delete-region start end)
       (save-excursion
         (goto-char start)
-        (insert (mapconcat 'identity lines "\n"))))))
+        (insert (mapconcat 'identity sorted-lines "\n"))))))
 
 (provide 'css-sort)
