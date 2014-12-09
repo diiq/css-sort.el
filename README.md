@@ -13,3 +13,7 @@ Stick the repo somewhere. Then do something like:
 (with-eval-after-load "scss-mode"
   (define-key scss-mode-map (kbd "C-c C-s") 'css-sort-attributes-in-region))
 ```
+
+Plop point into a morass of css attributes, and watch <kbd>C-c C-s</kbd> order them AS THOUGH BY MAGIC.
+
+MAGIC.
